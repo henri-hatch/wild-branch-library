@@ -1,25 +1,33 @@
 import './App.css';
-import wblIcon from './assets/wbl-icon.png'; // Import the icon
+import { useNavigate } from 'react-router-dom';
+import { Header } from './components/Header';
 
 function App() {
-  // Button labels based on the mockup
+  const navigate = useNavigate();
+  
+  // Button labels and their corresponding routes
   const buttons = [
-    'View Library',
-    'Add Book',
-    'Edit Book',
-    'Manage Users',
+    { label: 'View Library', route: '/library' },
+    { label: 'Add Book', route: '/add-book' },
+    { label: 'Edit Book', route: '/edit-book' },
+    { label: 'Manage Account', route: '/manage-account' },
   ];
+
+  const handleButtonClick = (route: string) => {
+    navigate(route);
+  };
 
   return (
     <div className="app-container">
-      <header className="header">
-        <img src={wblIcon} alt="Wild Branch Library Icon" className="header-icon" />
-        <h1 className="header-title">Wild Branch Library</h1>
-      </header>
+      <Header />
 
       <main className="button-grid">
-        {buttons.map((label) => (
-          <button key={label} className="grid-button">
+        {buttons.map(({ label, route }) => (
+          <button 
+            key={label} 
+            className="grid-button"
+            onClick={() => handleButtonClick(route)}
+          >
             {/* Icon placeholder can go here later */}
             <span>{label}</span>
           </button>

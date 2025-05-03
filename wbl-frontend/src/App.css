@@ -36,13 +36,13 @@
 }
 
 .header-icon {
-  width: 120px; /* Much larger icon */
+  width: 120px;
   height: 120px;
   margin-bottom: 1.5rem; /* Space between icon and title */
 }
 
 .header-title {
-  font-size: 3em; /* Larger title */
+  font-size: 3em;
   color: var(--accent-color);
   font-weight: 600;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Subtle text shadow */
@@ -50,10 +50,10 @@
 
 .button-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Changed to 2x2 grid */
+  grid-template-columns: 1fr 1fr; /* 2x2 grid */
   gap: 1.5rem; /* Slightly reduced gap for better fit */
   width: 100%;
-  max-width: 450px; /* Adjusted for 2x2 layout */
+  max-width: 450px;
 }
 
 .grid-button {
