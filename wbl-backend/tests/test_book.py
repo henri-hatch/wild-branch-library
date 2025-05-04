@@ -58,7 +58,7 @@ def setup_db():
         published_date=date(2023, 1, 1),
         genre="Fiction",
         description="A test book",
-        is_available=True,
+        location="Shelf A-1",
         owner_id=test_user.id
     )
     db.add(test_book)
@@ -120,7 +120,7 @@ def test_create_book():
             "published_date": "2024-01-01",
             "genre": "Non-fiction",
             "description": "A new test book",
-            "is_available": True
+            "location": "Shelf B-2"
         },
     )
     assert response.status_code == 201

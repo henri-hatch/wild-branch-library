@@ -27,7 +27,7 @@ def upgrade() -> None:
         sa.Column('genre', sa.String(100), nullable=True),
         sa.Column('description', sa.Text, nullable=True),
         sa.Column('cover_image', sa.String(255), nullable=True),
-        sa.Column('is_available', sa.Boolean, default=True),
+        sa.Column('location', sa.String(100), nullable=False),
         sa.Column('owner_id', sa.Integer, sa.ForeignKey('users.id'), nullable=True),
     )
 

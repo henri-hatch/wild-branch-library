@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey, Date
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Date
 from sqlalchemy.orm import relationship
 
 from core.database import Base
@@ -13,7 +13,7 @@ class Book(Base):
     genre = Column(String, nullable=True)
     description = Column(Text, nullable=True)
     cover_image = Column(String, nullable=True)
-    is_available = Column(Boolean, default=True)
+    location = Column(String, nullable=False)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
     owner = relationship("User", back_populates="books")

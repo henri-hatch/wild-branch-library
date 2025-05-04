@@ -9,7 +9,7 @@ class BookBase(BaseModel):
     genre: Optional[str] = None
     description: Optional[str] = None
     cover_image: Optional[str] = None
-    is_available: bool = True
+    location: str
 
 
 class BookCreate(BookBase):
@@ -23,7 +23,7 @@ class BookUpdate(BaseModel):
     genre: Optional[str] = None
     description: Optional[str] = None
     cover_image: Optional[str] = None
-    is_available: Optional[bool] = None
+    location: Optional[str] = None
 
 
 class BookResponse(BookBase):
