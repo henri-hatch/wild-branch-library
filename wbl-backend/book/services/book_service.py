@@ -10,12 +10,15 @@ class BookService:
         return db.query(Book).offset(skip).limit(limit).all()
 
     @staticmethod
-    def get_book_by_id(db: Session, book_id: int) -> Optional[Book]:
-        return db.query(Book).filter(Book.id == book_id).first()
-
-    @staticmethod
     def get_book_by_isbn(db: Session, isbn: str) -> Optional[Book]:
+        """Get a book by ISBN which is now the primary identifier"""
         return db.query(Book).filter(Book.isbn == isbn).first()
+
+    # The original get_book_by_id method is now redundant, but kept for backward compatibility
+    @staticmethod
+    def get_book_by_id(db: Session, book_isbn: str) -> Optional[Book]:
+        """Legacy method - use get_book_by_isbn instead"""
+        return BookService.get_book_by_isbn(db, book_isbn)
 
     @staticmethod
     def create_book(db: Session, book_data: BookCreate, owner_id: Optional[int] = None) -> Book:
@@ -26,8 +29,8 @@ class BookService:
         return db_book
 
     @staticmethod
-    def update_book(db: Session, book_id: int, book_data: BookUpdate) -> Optional[Book]:
-        db_book = BookService.get_book_by_id(db, book_id)
+    def update_book(db: Session, book_isbn: str, book_data: BookUpdate) -> Optional[Book]:
+        db_book = BookService.get_book_by_id(db, book_isbn)
         if db_book:
             update_data = book_data.model_dump(exclude_unset=True)
             for key, value in update_data.items():
@@ -37,8 +40,8 @@ class BookService:
         return db_book
 
     @staticmethod
-    def delete_book(db: Session, book_id: int) -> bool:
-        db_book = BookService.get_book_by_id(db, book_id)
+    def delete_book(db: Session, book_isbn: str) -> bool:
+        db_book = BookService.get_book_by_id(db, book_isbn)
         if db_book:
             db.delete(db_book)
             db.commit()
