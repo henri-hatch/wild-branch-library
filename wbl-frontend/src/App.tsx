@@ -5,7 +5,6 @@ import { Header } from './components/Header';
 function App() {
   const navigate = useNavigate();
   
-  // Button labels and their corresponding routes
   const buttons = [
     { label: 'View Library', route: '/library' },
     { label: 'Add Book', route: '/add-book' },
@@ -28,7 +27,6 @@ function App() {
             className="grid-button"
             onClick={() => handleButtonClick(route)}
           >
-            {/* Icon placeholder can go here later */}
             <span>{label}</span>
           </button>
         ))}
