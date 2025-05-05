@@ -5,6 +5,7 @@ import './index.css'
 import App from './App'
 import { Library } from './pages/Library'
 import { Auth } from './pages/Auth'
+import { ManageAccount } from './pages/ManageAccount'
 import { authService } from './services/api'
 
 // Centralized Authentication Check Component
@@ -62,6 +63,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/" element={<App />} /> 
           <Route path="/auth" element={<Auth />} />
           <Route path="/library" element={<Library />} /> 
+          <Route path="/manage-account" element={<ManageAccount />} />
           {/* Add other protected routes here */}
           
           {/* Fallback route - redirects to root, AuthCheck handles the rest */}
