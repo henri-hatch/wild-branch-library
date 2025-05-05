@@ -6,6 +6,7 @@ import App from './App'
 import { Library } from './pages/Library'
 import { Auth } from './pages/Auth'
 import { ManageAccount } from './pages/ManageAccount'
+import { AddBook } from './pages/AddBook'
 import { authService } from './services/api'
 
 // Centralized Authentication Check Component
@@ -30,11 +31,11 @@ function AuthCheck({ children }: { children: React.ReactElement }) {
 
     // Cleanup function to set isMounted to false when the component unmounts
     return () => { isMounted = false; };
-  }, [location]); // Re-check on location change
+  }, [location]);
 
   if (isAuthenticated === null) {
     // Still checking authentication
-    return <div>Loading...</div>; // Or a proper loading spinner
+    return <div>Loading...</div>;
   }
 
   // If not authenticated and trying to access a protected route (anything other than /auth)
@@ -64,6 +65,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/auth" element={<Auth />} />
           <Route path="/library" element={<Library />} /> 
           <Route path="/manage-account" element={<ManageAccount />} />
+          <Route path="/add-book" element={<AddBook />} /> {/* New Add Book route */}
           {/* Add other protected routes here */}
           
           {/* Fallback route - redirects to root, AuthCheck handles the rest */}

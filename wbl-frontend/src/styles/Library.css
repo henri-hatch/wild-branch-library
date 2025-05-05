@@ -28,7 +28,7 @@
 }
 
 .book-table th {
-  text-align: left;
+  text-align: center;
   padding: 1rem 0.5rem;
   font-weight: 600;
   color: var(--accent-color-dark);
@@ -38,6 +38,7 @@
 
 .book-table td {
   padding: 0.8rem 0.5rem;
+  text-align: center; /* Add this to center all cell content */
   border-bottom: 1px solid rgba(139, 69, 19, 0.2); /* Light brown divider */
 }
 
