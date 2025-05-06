@@ -2,6 +2,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from book.models.book import Book
 from book.schemas.book import BookCreate, BookUpdate
+import requests
 
 
 class BookService:
@@ -56,3 +57,30 @@ class BookService:
             (Book.isbn.ilike(f"%{search_term}%")) |
             (Book.genre.ilike(f"%{search_term}%"))
         ).offset(skip).limit(limit).all()
+    
+    @staticmethod
+    def get_book_details(isbn: str) -> dict:
+        url = f"https://openlibrary.org/search.json?isbn={isbn}&fields=title,author_name,cover_i"
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("numFound", 0) > 0:
+                doc = data["docs"][0]
+                title = doc.get("title", "No title found")
+                author = doc.get("author_name", ["No author found"])[0] if doc.get("author_name") else "No author found"
+                cover_image = f"https://covers.openlibrary.org/b/id/{doc.get('cover_i')}-L.jpg" if doc.get("cover_i") else None
+                
+                return {
+                    "title": title,
+                    "author": author,
+                    "cover_image": cover_image,
+                    "isbn": isbn
+                }
+
+        return {
+            "title": "No title found",
+            "author": "No author found",
+            "cover_image": None,
+            "isbn": isbn
+        }

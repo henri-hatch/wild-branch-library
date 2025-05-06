@@ -32,6 +32,30 @@ def get_book(book_isbn: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Book not found")
     return db_book
 
+@router.get("/details/{book_isbn}", response_model=BookResponse)
+def get_book_details(book_isbn: str, db: Session = Depends(get_db)):
+    """Get book details from OpenLibrary API"""
+    # Check to make sure book doesn't already exist in the database if it does return a 204 No Content
+    db_book = BookService.get_book_by_id(db, book_isbn)
+    if db_book is not None:
+        raise HTTPException(status_code=204, detail="Book already exists")
+    
+    # Call the OpenLibrary API to get book details
+    book_details = BookService.get_book_details(book_isbn)
+    
+    # Create a BookResponse object with the fetched details
+    # We don't save this to the database yet - that happens when the user confirms creation
+    return BookResponse(
+        isbn=book_isbn,
+        title=book_details["title"],
+        author=book_details["author"],
+        cover_image=book_details["cover_image"],
+        # Default values for required fields that aren't provided by the API
+        location="Unknown",
+        genre=None,
+        description=None,
+        owner_id=None
+    )
 
 @router.post("", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
 def create_book(

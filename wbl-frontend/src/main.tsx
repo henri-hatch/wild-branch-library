@@ -65,8 +65,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/auth" element={<Auth />} />
           <Route path="/library" element={<Library />} /> 
           <Route path="/manage-account" element={<ManageAccount />} />
-          <Route path="/add-book" element={<AddBook />} /> {/* New Add Book route */}
-          {/* Add other protected routes here */}
+          <Route path="/add-book" element={<AddBook />} />
           
           {/* Fallback route - redirects to root, AuthCheck handles the rest */}
           <Route path="*" element={<Navigate to="/" replace />} /> 

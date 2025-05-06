@@ -16,7 +16,6 @@ from user.services.user_service import get_user_by_email
 SECRET_KEY = settings.JWT_SECRET_KEY
 ALGORITHM = "HS256"
 
-# For family use, we'll use a longer token URL path that's more descriptive
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login/access-token")
 
 
