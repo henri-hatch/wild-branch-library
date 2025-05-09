@@ -1,14 +1,14 @@
 // Book related types
 export interface Book {
-  id?: number;
+  id: number; // New primary key
   isbn: string;
   title: string;
   author: string;
-  genre: string;
-  description: string;
-  cover_image: string;
+  genre?: string;
+  description?: string;
+  cover_image?: string;
   location: string;
-  owner_id?: number; // ID of the user who owns the book
+  owner_id: number; // Foreign key to User
 }
 
 // Authentication related types

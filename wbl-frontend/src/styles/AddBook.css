@@ -165,3 +165,24 @@
   transform: none;
   box-shadow: none;
 }
+
+.cover-preview-container {
+  margin-bottom: 15px;
+}
+
+.book-cover-preview {
+  max-width: 200px; /* Or your desired width */
+  max-height: 300px; /* Or your desired height */
+  width: auto;
+  height: auto;
+  border: 1px solid #ccc;
+  object-fit: cover; /* To maintain aspect ratio and fill dimensions */
+}
+
+.isbn-prompt-container {
+  /* Styles for the ISBN prompt section if needed */
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}

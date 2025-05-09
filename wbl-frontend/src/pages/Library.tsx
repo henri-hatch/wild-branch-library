@@ -58,7 +58,7 @@ export function Library() {
   };
   
   const handleEditBook = (book: Book) => {
-    navigate(`/edit-book/${book.isbn}`, { state: { book } });
+    navigate(`/edit-book/${book.id}`, { state: { book } }); // Navigate with book.id
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

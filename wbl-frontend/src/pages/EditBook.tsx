@@ -7,7 +7,7 @@ import '../styles/AddBook.css'; // Reuse the AddBook styles
 
 export function EditBook() {
   const navigate = useNavigate();
-  const { isbn } = useParams<{ isbn: string }>();
+  const { id: bookId } = useParams<{ id: string }>(); // Changed from isbn to id
   const location = useLocation();
   const bookFromLocation = location.state?.book as Book | undefined;
   
@@ -16,6 +16,7 @@ export function EditBook() {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<Book>(
     bookFromLocation || {
+      id: 0,
       isbn: '',
       title: '',
       author: '',
@@ -23,20 +24,21 @@ export function EditBook() {
       description: '',
       cover_image: '',
       location: '',
+      owner_id: 0,
     }
   );
 
   useEffect(() => {
-    // If we didn't get the book data from the location state, fetch it
-    if (!bookFromLocation && isbn) {
-      fetchBook(isbn);
+    // If we didn't get the book data from the location state, fetch it by ID
+    if (!bookFromLocation && bookId) {
+      fetchBookById(Number(bookId)); // Ensure bookId is a number
     }
-  }, [isbn, bookFromLocation]);
+  }, [bookId, bookFromLocation]);
 
-  const fetchBook = async (bookIsbn: string) => {
+  const fetchBookById = async (id: number) => {
     setIsLoading(true);
     try {
-      const response = await bookService.getBookByISBN(bookIsbn);
+      const response = await bookService.getBookById(id);
       
       if (response.error) {
         setError(response.error);
@@ -66,7 +68,13 @@ export function EditBook() {
     setError(null);
 
     try {
-      const response = await bookService.updateBook(formData.isbn, formData);
+      // formData.id should exist if we are editing an existing book
+      if (formData.id === undefined) {
+        setError("Book ID is missing, cannot update.");
+        setIsSubmitting(false);
+        return;
+      }
+      const response = await bookService.updateBook(formData.id, formData); 
       
       if (response.error) {
         setError(response.error);
@@ -129,7 +137,7 @@ export function EditBook() {
                 value={formData.isbn}
                 onChange={handleChange}
                 required
-                readOnly // ISBN should not be edited as it's the identifier
+                readOnly // ISBN should not be edited after creation
               />
             </div>
             
@@ -179,19 +187,31 @@ export function EditBook() {
               />
             </div>
             
+            <div className="form-group">
+              <label htmlFor="cover_image">Cover Image URL</label>
+              <input
+                type="url"
+                id="cover_image"
+                name="cover_image"
+                value={formData.cover_image || ''}
+                onChange={handleChange}
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+
             {formData.cover_image && (
-              <div className="form-group">
-                <label>Cover Image</label>
+              <div className="form-group cover-preview-container">
+                <label>Cover Preview</label>
                 <img 
                   src={formData.cover_image} 
-                  alt={`Cover of ${formData.title}`} 
+                  alt={`Cover of ${formData.title}`}
                   className="book-cover-preview" 
                 />
               </div>
             )}
             
             <div className="button-group">
-              <button type="submit" disabled={isSubmitting} className="primary-button">
+              <button type="submit" disabled={isSubmitting} className="submit-button">
                 {isSubmitting ? 'Updating...' : 'Update Book'}
               </button>
             </div>
