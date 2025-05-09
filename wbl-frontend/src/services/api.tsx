@@ -162,6 +162,21 @@ export const bookService = {
     }
   },
 
+  async getBookByISBN(isbn: string): Promise<ApiResponse<Book>> {
+    try {
+      const response: AxiosResponse<Book> = await api.get(`/api/books/${isbn}`);
+      return {
+        data: response.data,
+        status: response.status
+      };
+    } catch (error: any) {
+      return {
+        error: error.response?.data?.detail || 'Failed to fetch book',
+        status: error.response?.status || 500
+      };
+    }
+  },
+
   async addBook(bookData: Book): Promise<ApiResponse<Book>> {
     try {
       const response: AxiosResponse<Book> = await api.post('/api/books', bookData);
@@ -172,6 +187,21 @@ export const bookService = {
     } catch (error: any) {
       return {
         error: error.response?.data?.detail || 'Failed to add book',
+        status: error.response?.status || 500
+      };
+    }
+  },
+
+  async updateBook(isbn: string, bookData: Partial<Book>): Promise<ApiResponse<Book>> {
+    try {
+      const response: AxiosResponse<Book> = await api.put(`/api/books/${isbn}`, bookData);
+      return {
+        data: response.data,
+        status: response.status
+      };
+    } catch (error: any) {
+      return {
+        error: error.response?.data?.detail || 'Failed to update book',
         status: error.response?.status || 500
       };
     }

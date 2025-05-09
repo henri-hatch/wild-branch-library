@@ -7,6 +7,7 @@ import { Library } from './pages/Library'
 import { Auth } from './pages/Auth'
 import { ManageAccount } from './pages/ManageAccount'
 import { AddBook } from './pages/AddBook'
+import { EditBook } from './pages/EditBook'
 import { authService } from './services/api'
 
 // Centralized Authentication Check Component
@@ -66,6 +67,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/library" element={<Library />} /> 
           <Route path="/manage-account" element={<ManageAccount />} />
           <Route path="/add-book" element={<AddBook />} />
+          <Route path="/edit-book/:isbn" element={<EditBook />} />
           
           {/* Fallback route - redirects to root, AuthCheck handles the rest */}
           <Route path="*" element={<Navigate to="/" replace />} /> 

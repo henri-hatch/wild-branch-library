@@ -8,7 +8,7 @@ function App() {
   const buttons = [
     { label: 'View Library', route: '/library' },
     { label: 'Add Book', route: '/add-book' },
-    { label: 'Edit Book', route: '/edit-book' },
+    { label: '', route: '/' },
     { label: 'Manage Account', route: '/manage-account' },
   ];
 
