@@ -5,7 +5,8 @@ import {
   Book, 
   LoginRequest, 
   SignUpRequest, 
-  User 
+  User,
+  Library
 } from '../models';
 
 const TOKEN_KEY = 'auth_token';
@@ -232,7 +233,7 @@ export const bookService = {
     }
   },
 
-  async addBook(bookData: Omit<Book, 'id' | 'owner_id'>): Promise<ApiResponse<Book>> { // Frontend sends data without id/owner_id
+  async addBook(bookData: Omit<Book, 'id' | 'owner_id'>): Promise<ApiResponse<Book>> { // Frontend sends data with library_id but without id/owner_id
     try {
       const response: AxiosResponse<Book> = await api.post('/api/books', bookData);
       return { data: response.data, status: response.status };
@@ -263,6 +264,80 @@ export const bookService = {
     } catch (error: any) {
       return { 
         error: error.response?.data?.detail || 'Failed to delete book',
+        status: error.response?.status || 500
+      };
+    }
+  }
+};
+
+export const libraryService = {
+  async getUserLibraries(): Promise<ApiResponse<Library[]>> {
+    try {
+      const response: AxiosResponse<Library[]> = await api.get('/api/libraries');
+      return { data: response.data, status: response.status };
+    } catch (error: any) {
+      return { 
+        error: error.response?.data?.detail || 'Failed to fetch libraries',
+        status: error.response?.status || 500
+      };
+    }
+  },
+
+  async getAllLibraries(): Promise<ApiResponse<Library[]>> {
+    try {
+      const response: AxiosResponse<Library[]> = await api.get('/api/libraries/all');
+      return { data: response.data, status: response.status };
+    } catch (error: any) {
+      return { 
+        error: error.response?.data?.detail || 'Failed to fetch all libraries',
+        status: error.response?.status || 500
+      };
+    }
+  },
+
+  async getLibraryById(id: number): Promise<ApiResponse<Library>> {
+    try {
+      const response: AxiosResponse<Library> = await api.get(`/api/libraries/${id}`);
+      return { data: response.data, status: response.status };
+    } catch (error: any) {
+      return { 
+        error: error.response?.data?.detail || 'Failed to fetch library',
+        status: error.response?.status || 500
+      };
+    }
+  },
+
+  async createLibrary(name: string): Promise<ApiResponse<Library>> {
+    try {
+      const response: AxiosResponse<Library> = await api.post('/api/libraries', { name });
+      return { data: response.data, status: response.status };
+    } catch (error: any) {
+      return { 
+        error: error.response?.data?.detail || 'Failed to create library',
+        status: error.response?.status || 500
+      };
+    }
+  },
+
+  async updateLibrary(id: number, name: string): Promise<ApiResponse<Library>> {
+    try {
+      const response: AxiosResponse<Library> = await api.put(`/api/libraries/${id}`, { name });
+      return { data: response.data, status: response.status };
+    } catch (error: any) {
+      return { 
+        error: error.response?.data?.detail || 'Failed to update library',
+        status: error.response?.status || 500
+      };
+    }
+  },
+
+  async deleteLibrary(id: number): Promise<ApiResponse<null>> {
+    try {
+      const response: AxiosResponse<null> = await api.delete(`/api/libraries/${id}`);
+      return { data: null, status: response.status };
+    } catch (error: any) {
+      return { 
+        error: error.response?.data?.detail || 'Failed to delete library',
         status: error.response?.status || 500
       };
     }

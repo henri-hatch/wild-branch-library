@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/Header';
-import { bookService } from '../services/api';
-import { Book } from '../models';
+import { bookService, libraryService } from '../services/api';
+import { Book, Library as ILibrary } from '../models';
 import '../styles/Library.css';
 
 export function Library() {
@@ -12,9 +12,11 @@ export function Library() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [libraries, setLibraries] = useState<Record<number, string>>({});
 
   useEffect(() => {
     fetchBooks();
+    fetchLibraries();
   }, []);
 
   useEffect(() => {
@@ -53,6 +55,27 @@ export function Library() {
       setLoading(false);
     }
   };
+
+  const fetchLibraries = async () => {
+    try {
+      const response = await libraryService.getAllLibraries();
+      
+      if (response.error) {
+        setError(response.error);
+      } else {
+        const libraryMap: Record<number, string> = {};
+        response.data?.forEach((library: ILibrary) => {
+          libraryMap[library.id] = library.name;
+        });
+        setLibraries(libraryMap);
+        setError(null);
+      }
+    } catch (err) {
+      setError('Failed to fetch libraries. Please try again later.');
+      console.error('Error fetching libraries:', err);
+    }
+  };
+
   const handleBackClick = () => {
     navigate('/');
   };
@@ -87,7 +110,7 @@ export function Library() {
                 <th>Book</th>
                 <th>Author</th>
                 <th>Owner</th>
-                <th>Location</th>
+                <th>Library</th>
               </tr>
             </thead>
             <tbody>
@@ -115,7 +138,7 @@ export function Library() {
                     <td>{book.title}</td>
                     <td>{book.author}</td>
                     <td>Owner {book.owner_id}</td>
-                    <td>{book.location}</td>
+                    <td>{libraries[book.library_id] || `Library ID: ${book.library_id}`}</td>
                   </tr>
                 ))
               )}

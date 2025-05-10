@@ -5,15 +5,19 @@ from core.config_loader import settings
 from auth.routes.auth_router import auth_router
 from user.routes.user_router import user_router
 from book.routes.book_router import router as book_router
+from library.routes.library_router import router as library_router
 
 openapi_tags = [
     {
         "name": "Users",
         "description": "User operations",
-    },
-    {
+    },    {
         "name": "Books",
         "description": "Library book operations",
+    },
+    {
+        "name": "Libraries",
+        "description": "Library management operations",
     },
     {
         "name": "Health Checks",
@@ -37,6 +41,7 @@ if settings.BACKEND_CORS_ORIGINS:
 app.include_router(auth_router, prefix='/api')
 app.include_router(user_router, prefix='/api', tags=['Users'])
 app.include_router(book_router, prefix='/api', tags=['Books'])
+app.include_router(library_router, prefix='/api', tags=['Libraries'])
 
 @app.get("/health", tags=['Health Checks'])
 def read_root():

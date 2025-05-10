@@ -1,13 +1,20 @@
+// Library related types
+export interface Library {
+  id: number;
+  name: string;
+  user_id: number; // Foreign key to User
+}
+
 // Book related types
 export interface Book {
-  id: number; // New primary key
+  id: number; // Primary key
   isbn: string;
   title: string;
   author: string;
   genre?: string;
   description?: string;
   cover_image?: string;
-  location: string;
+  library_id: number; // Foreign key to Library
   owner_id: number; // Foreign key to User
 }
 

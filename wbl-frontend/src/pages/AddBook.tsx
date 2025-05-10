@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/Header';
-import { bookService } from '../services/api';
-import { Book } from '../models';
+import { bookService, libraryService } from '../services/api';
+import { Book, Library } from '../models';
 import '../styles/AddBook.css';
 
 export function AddBook() {
@@ -11,7 +11,8 @@ export function AddBook() {
   const [showIsbnPrompt, setShowIsbnPrompt] = useState(true);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);  const [libraries, setLibraries] = useState<Library[]>([]);
+  const [isLoadingLibraries, setIsLoadingLibraries] = useState(true);
   const [formData, setFormData] = useState<Omit<Book, 'id' | 'owner_id'>>({
     isbn: '',
     title: '',
@@ -19,8 +20,37 @@ export function AddBook() {
     genre: '',
     description: '',
     cover_image: '',
-    location: '',
+    library_id: -1, // Initialize with invalid ID, will be updated when libraries load
   });
+
+  useEffect(() => {
+    fetchLibraries();
+  }, []);
+  const fetchLibraries = async () => {
+    setIsLoadingLibraries(true);
+    try {
+      const response = await libraryService.getUserLibraries();
+      if (response.error) {
+        setError(response.error);
+      } else if (response.data) {
+        setLibraries(response.data);
+        // If libraries are loaded and there's at least one, set the default library
+        if (response.data.length > 0) {
+          // Create a local library var for type safety
+          const library = response.data[0];
+          setFormData(prev => ({ ...prev, library_id: library.id }));
+        }
+      } else {
+        // Handle case where response.data is undefined
+        setLibraries([]);
+      }
+    } catch (err) {
+      setError('Failed to fetch libraries. Please try again later.');
+      console.error('Error fetching libraries:', err);
+    } finally {
+      setIsLoadingLibraries(false);
+    }
+  };
 
   const handleIsbnLookupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsbnForLookup(e.target.value);
@@ -39,48 +69,65 @@ export function AddBook() {
       if (response.status === 204) {
         setError(`Book with ISBN ${isbnForLookup} already exists in the library. You can edit it from the library page.`);
         // Optionally, you could navigate to edit page or clear form
-        setFormData({
-          isbn: isbnForLookup, title: '', author: '', genre: '', description: '', cover_image: '', location: ''
-        });
-      } else if (response.error) {
+        setFormData(prev => ({          ...prev,
+          isbn: isbnForLookup, 
+          title: '', 
+          author: '', 
+          genre: '', 
+          description: '', 
+          cover_image: ''
+          // Keep the current library_id
+        }));      } else if (response.error) {
         setError(response.error);
-        setFormData({ // Reset form but keep entered ISBN
-          isbn: isbnForLookup, title: '', author: '', genre: '', description: '', cover_image: '', location: ''
-        });
+        setFormData(prev => ({ // Reset form but keep entered ISBN and library
+          ...prev,
+          isbn: isbnForLookup, 
+          title: '', 
+          author: '', 
+          genre: '', 
+          description: '', 
+          cover_image: ''
+        }));
       } else if (response.data) {
-        setFormData({
-          isbn: response.data.isbn || isbnForLookup,
-          title: response.data.title || '',
-          author: response.data.author || '',
-          genre: response.data.genre || '',
-          description: response.data.description || '',
-          cover_image: response.data.cover_image || '',
-          location: response.data.location || '', // Default or fetched location
-        });
+        setFormData(prev => ({          ...prev,
+          isbn: response.data?.isbn || isbnForLookup,
+          title: response.data?.title || '',
+          author: response.data?.author || '',
+          genre: response.data?.genre || '',
+          description: response.data?.description || '',
+          cover_image: response.data?.cover_image || '',
+          // Keep the existing library_id
+        }));
       } else {
         // No data and no specific error, means book not found by API
         setError(`No details found for ISBN ${isbnForLookup}. Please fill the form manually.`);
-        setFormData({
-            isbn: isbnForLookup, title: '', author: '', genre: '', description: '', cover_image: '', location: ''
-        });
+        setFormData(prev => ({            ...prev,
+            isbn: isbnForLookup, 
+            title: '', 
+            author: '', 
+            genre: '', 
+            description: '', 
+            cover_image: ''
+            // Keep the existing library_id
+        }));
       }
     } catch (err) {
       setError('Failed to fetch book details. Please try again or fill the form manually.');
       console.error('Error fetching book details:', err);
-      setFormData({ // Reset form but keep entered ISBN
-        isbn: isbnForLookup, title: '', author: '', genre: '', description: '', cover_image: '', location: ''
-      });
+      setFormData(prev => ({ // Reset form but keep entered ISBN and library
+        ...prev,
+        isbn: isbnForLookup, title: '', author: '', genre: '', description: '', cover_image: ''
+      }));
     } finally {
       setIsLoadingDetails(false);
       setShowIsbnPrompt(false); // Hide prompt, show form
     }
   };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: name === 'library_id' ? Number(value) : value
     }));
   };
 
@@ -219,20 +266,29 @@ export function AddBook() {
                 onChange={handleChange}
                 rows={4}
               />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="location">Location *</label>
+            </div>            <div className="form-group">
+              <label htmlFor="library_id">Library *</label>
               <select
-                id="location"
-                name="location"
-                value={formData.location}
+                id="library_id"
+                name="library_id"
+                value={formData.library_id}
                 onChange={handleChange}
                 required
               >
-                <option value="aa">Default Location (aa)</option>
-                {/* More locations can be added here later */}
+                <option value="" disabled={libraries.length > 0}>
+                  {isLoadingLibraries ? "Loading libraries..." : "Select a library"}
+                </option>
+                {libraries.map(library => (
+                  <option key={library.id} value={library.id}>
+                    {library.name}
+                  </option>
+                ))}
               </select>
+              {libraries.length === 0 && !isLoadingLibraries && (
+                <div className="helper-text error-message">
+                  Please <a href="/manage-libraries">create a library</a> before adding books.
+                </div>
+              )}
             </div>
             
             <div className="form-group">
@@ -257,12 +313,11 @@ export function AddBook() {
                 />
               </div>
             )}
-            
-            <div className="button-group">
+              <div className="button-group">
               <button 
                 type="submit" 
                 className="submit-button" 
-                disabled={isSubmitting}
+                disabled={isSubmitting || libraries.length === 0 || formData.library_id < 1}
               >
                 {isSubmitting ? 'Adding...' : 'Add Book'}
               </button>

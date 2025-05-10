@@ -14,6 +14,6 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now(timezone.utc), nullable=False)
     updated_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-    
-    # Relationship with books
+      # Relationships
     books = relationship("Book", back_populates="owner")
+    libraries = relationship("Library", back_populates="owner")

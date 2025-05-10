@@ -29,9 +29,7 @@ class BookService:
     @staticmethod
     def get_book_by_isbn_and_owner(db: Session, isbn: str, owner_id: int) -> Optional[BookModel]:
         """Fetches a specific book instance by ISBN for a given owner."""
-        return db.query(BookModel).filter(BookModel.isbn == isbn, BookModel.owner_id == owner_id).first()
-
-    @staticmethod
+        return db.query(BookModel).filter(BookModel.isbn == isbn, BookModel.owner_id == owner_id).first()    @staticmethod
     def get_book_details_from_external(isbn: str) -> Optional[dict]:
         """Fetches book details from OpenLibrary API."""
         url = f"https://openlibrary.org/api/books?bibkeys=ISBN:{isbn}&format=json&jscmd=data"
@@ -46,7 +44,8 @@ class BookService:
                 return {
                     "title": book_data.get('title', 'N/A'),
                     "author": authors if authors else "N/A",
-                    "cover_image": cover_url
+                    "cover_image": cover_url,
+                    # No library_id from external API
                 }
             return None
         except requests.exceptions.RequestException as e:

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Header } from '../components/Header';
-import { bookService } from '../services/api';
-import { Book } from '../models';
+import { bookService, libraryService } from '../services/api';
+import { Book, Library } from '../models';
 import '../styles/AddBook.css'; // Reuse the AddBook styles
 
 export function EditBook() {
@@ -12,8 +12,9 @@ export function EditBook() {
   const bookFromLocation = location.state?.book as Book | undefined;
   
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(!bookFromLocation);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(!bookFromLocation);  const [error, setError] = useState<string | null>(null);
+  const [libraries, setLibraries] = useState<Library[]>([]);
+  const [isLoadingLibraries, setIsLoadingLibraries] = useState(true);
   const [formData, setFormData] = useState<Book>(
     bookFromLocation || {
       id: 0,
@@ -23,17 +24,36 @@ export function EditBook() {
       genre: '',
       description: '',
       cover_image: '',
-      location: '',
+      library_id: -1, // Initialize with invalid ID, will be updated when libraries load
       owner_id: 0,
     }
   );
-
   useEffect(() => {
     // If we didn't get the book data from the location state, fetch it by ID
     if (!bookFromLocation && bookId) {
       fetchBookById(Number(bookId)); // Ensure bookId is a number
     }
+    
+    // Fetch libraries for the dropdown
+    fetchLibraries();
   }, [bookId, bookFromLocation]);
+  
+  const fetchLibraries = async () => {
+    setIsLoadingLibraries(true);
+    try {
+      const response = await libraryService.getUserLibraries();
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setLibraries(response.data || []);
+      }
+    } catch (err) {
+      setError('Failed to fetch libraries. Please try again later.');
+      console.error('Error fetching libraries:', err);
+    } finally {
+      setIsLoadingLibraries(false);
+    }
+  };
 
   const fetchBookById = async (id: number) => {
     setIsLoading(true);
@@ -53,12 +73,11 @@ export function EditBook() {
       setIsLoading(false);
     }
   };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: name === 'library_id' ? Number(value) : value
     }));
   };
 
@@ -173,18 +192,29 @@ export function EditBook() {
                 onChange={handleChange}
                 rows={4}
               />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="location">Location</label>
-              <input 
-                type="text" 
-                id="location" 
-                name="location" 
-                value={formData.location}
+            </div>            <div className="form-group">
+              <label htmlFor="library_id">Library *</label>
+              <select
+                id="library_id"
+                name="library_id"
+                value={formData.library_id}
                 onChange={handleChange}
                 required
-              />
+              >
+                <option value="" disabled={libraries.length > 0}>
+                  {isLoadingLibraries ? "Loading libraries..." : "Select a library"}
+                </option>
+                {libraries.map(library => (
+                  <option key={library.id} value={library.id}>
+                    {library.name}
+                  </option>
+                ))}
+              </select>
+              {libraries.length === 0 && !isLoadingLibraries && (
+                <div className="helper-text error-message">
+                  Please <a href="/manage-libraries">create a library</a> before editing books.
+                </div>
+              )}
             </div>
             
             <div className="form-group">
@@ -209,9 +239,12 @@ export function EditBook() {
                 />
               </div>
             )}
-            
-            <div className="button-group">
-              <button type="submit" disabled={isSubmitting} className="submit-button">
+              <div className="button-group">
+              <button 
+                type="submit" 
+                disabled={isSubmitting || libraries.length === 0 || formData.library_id < 1} 
+                className="submit-button"
+              >
                 {isSubmitting ? 'Updating...' : 'Update Book'}
               </button>
             </div>

@@ -66,11 +66,10 @@ def get_book_details(book_isbn: str, db: Session = Depends(get_db)):
         isbn=book_isbn,
         title=book_details.get("title", "N/A"),
         author=book_details.get("author", "N/A"),
-        cover_image=book_details.get("cover_image"),
-        # These are not set from external API, will be set by user
+        cover_image=book_details.get("cover_image"),        # These are not set from external API, will be set by user
         genre=None,
         description=None,
-        location="Unknown", # Default location
+        library_id=None, # Will be set by user
     )
 
 @router.post("", response_model=BookResponseWithId, status_code=status.HTTP_201_CREATED) # Changed to BookResponseWithId
