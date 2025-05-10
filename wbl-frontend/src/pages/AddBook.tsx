@@ -183,7 +183,6 @@ export function AddBook() {
                 value={formData.isbn}
                 onChange={handleChange}
                 required
-                readOnly // ISBN might be read-only if fetched
               />
             </div>
 
@@ -212,14 +211,13 @@ export function AddBook() {
             </div>
             
             <div className="form-group">
-              <label htmlFor="description">Description *</label>
+              <label htmlFor="description">Description</label>
               <textarea 
                 id="description" 
                 name="description" 
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                required
               />
             </div>
             
@@ -271,7 +269,7 @@ export function AddBook() {
               <button 
                 type="button" 
                 className="cancel-button" 
-                onClick={handleBackClick} // Use updated handler
+                onClick={handleBackClick}
                 disabled={isSubmitting}
               >
                 Cancel

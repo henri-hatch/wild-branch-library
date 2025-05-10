@@ -54,7 +54,6 @@ def upgrade() -> None:
             print(f"Could not drop constraint 'pk_books_isbn': {e_pk_isbn}. The migration might fail if an old PK on ISBN still exists.")
 
     # Attempt to drop the old unique index on ISBN if it exists
-    # The error message refers to "ix_books_isbn"
     try:
         op.drop_index('ix_books_isbn', table_name='books')
         print("Successfully dropped unique index 'ix_books_isbn'.")
